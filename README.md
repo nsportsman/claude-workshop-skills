@@ -13,57 +13,6 @@ Curated Claude MCP skills ready for live workshops and self-serve setup. The rep
 └── scripts/                # Helper utilities for selective installs
 ```
 
-## Architecture Overview
-
-```mermaid
-flowchart TB
-    subgraph Skills["Skill Definitions"]
-        Chrome[`skills/chrome-devtools`]
-        Diagram[`skills/diagram`]
-        Github[`skills/github`]
-        Review[`skills/review`]
-    end
-
-    subgraph Support["Supporting Files"]
-        HookCD[`hooks/hooks.chrome-devtools.ts`]
-        HookGH[`hooks/hooks.github.ts`]
-        SetCD[`settings/settings.chrome-devtools.json`]
-        SetGH[`settings/settings.github.json`]
-        MCPChrome[`mcp/mcp.chrome-devtools.json`]
-    end
-
-    subgraph Claude["~/.claude destinations"]
-        DestSkills[`skills/<name>`]
-        DestHooks[`hooks/`]
-        DestSettings[`settings/`]
-        DestMCP[`mcp/`]
-        SettingsJson[`settings.json allowlist`]
-    end
-
-    Chrome --> HookCD
-    Chrome --> SetCD
-    Chrome --> MCPChrome
-
-    Github --> HookGH
-    Github --> SetGH
-
-    Diagram -. optional -.-> SettingsJson
-    Review --> SettingsJson
-
-    Chrome --> DestSkills
-    Diagram --> DestSkills
-    Github --> DestSkills
-    Review --> DestSkills
-
-    HookCD --> DestHooks
-    HookGH --> DestHooks
-    SetCD --> DestSettings
-    SetGH --> DestSettings
-    MCPChrome --> DestMCP
-```
-
-Each skill explicitly lists the Hook/Settings/MCP artifacts it depends on. Copying a skill means also pulling its supporting files into the matching `~/.claude` directories and updating the global `settings.json` allowlist when required.
-
 ## Skill Index
 
 | Skill | Summary | Supporting Files | Notes |
