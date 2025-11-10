@@ -17,13 +17,6 @@ Curated Claude MCP skills ready for live workshops and self-serve setup. The rep
 
 ```mermaid
 flowchart TB
-    Repo[Workshop Repo]
-    Script[scripts/install-skill.sh]
-
-    Repo --> Script
-    Repo --> Skills
-    Repo --> Support
-
     subgraph Skills["Skill Definitions"]
         Chrome[`skills/chrome-devtools`]
         Diagram[`skills/diagram`]
@@ -47,11 +40,6 @@ flowchart TB
         SettingsJson[`settings.json allowlist`]
     end
 
-    Script --> Chrome
-    Script --> Diagram
-    Script --> Github
-    Script --> Review
-
     Chrome --> HookCD
     Chrome --> SetCD
     Chrome --> MCPChrome
@@ -72,14 +60,9 @@ flowchart TB
     SetCD --> DestSettings
     SetGH --> DestSettings
     MCPChrome --> DestMCP
-
-    Script --> DestSkills
-    Script --> DestHooks
-    Script --> DestSettings
-    Script --> DestMCP
 ```
 
-Each skill explicitly lists the Hook/Settings/MCP artifacts it depends on. The helper script resolves those dependencies, copying the skill folder plus supporting files into the matching directories under `~/.claude`, and reminds attendees to update the global `settings.json` allowlist when required.
+Each skill explicitly lists the Hook/Settings/MCP artifacts it depends on. Copying a skill means also pulling its supporting files into the matching `~/.claude` directories and updating the global `settings.json` allowlist when required.
 
 ## Skill Index
 
