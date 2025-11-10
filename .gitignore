@@ -1,0 +1,16 @@
+# Dependency directories
+node_modules/
+
+# Bun lockfiles (regenerated on install)
+bun.lock
+
+# macOS metadata
+.DS_Store
+
+# IDE metadata (ensure repo stays clean)
+.vscode/
+.idea/
+
+# Claude runtime caches
+.cursor/
+.cache/
