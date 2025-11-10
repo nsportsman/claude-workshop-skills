@@ -13,6 +13,34 @@ Curated Claude MCP skills ready for live workshops and self-serve setup. The rep
 └── scripts/                # Helper utilities for selective installs
 ```
 
+## Architecture Overview
+
+```mermaid
+flowchart LR
+    Repo[Workshop Repo] --> Scripts[scripts/install-skill.sh]
+    Repo --> Skills
+    Repo --> Hooks
+    Repo --> Settings
+    Repo --> MCP
+
+    subgraph Skills[skills/]
+        chrome[chrome-devtools]
+        diagram[diagram]
+        github[github]
+        review[review]
+    end
+
+    Scripts --> ClaudeHome[~/.claude]
+    Skills --> ClaudeHome
+    Hooks --> ClaudeHome
+    Settings --> ClaudeHome
+    MCP --> ClaudeHome
+
+    ClaudeHome --> ClaudeAgent[Claude Session]
+```
+
+Each directory mirrors a part of the attendee's `~/.claude` workspace. The helper script orchestrates copying only the selected skill (plus its hooks/settings/MCP support) into place so the Claude session can immediately activate the new capability set.
+
 ## Skill Index
 
 | Skill | Summary | Supporting Files | Notes |
@@ -126,10 +154,21 @@ rsync -av --exclude='.git' "$WORKDIR/" "$HOME/.claude/"
 
 Sparse-checkout clones can run `git pull` followed by the same `./scripts/install-skill.sh <skill>` command to refresh local copies.
 
-## Troubleshooting & Tips
+## Troubleshooting
 
-- If hooks fail to run, confirm `bun --version` works and rerun `bun install` under `~/.claude/hooks` and `~/.claude/settings`.
-- For Chrome DevTools, ensure a Chrome browser is available and that Claude has the necessary permissions to launch the MCP server defined in `mcp/mcp.chrome-devtools.json`.
-- When editing `settings.json`, keep the existing permissions and append new `Skill(...)` entries rather than overwriting the list.
-- Encourage attendees to keep their original `~/.claude` backup so they can revert after the workshop if desired.
+- **Hooks fail with `bun: command not found`**  
+  Install Bun from [bun.sh](https://bun.sh) and rerun `bun install` inside `~/.claude/hooks` and `~/.claude/settings`.
+- **Skill does not appear in Claude**  
+  Append the matching `Skill(...)` entry to `~/.claude/settings.json` and restart Claude so it reloads permissions.
+- **Chrome DevTools tools time out**  
+  Make sure Chrome is installed, the MCP server in `mcp/mcp.chrome-devtools.json` can launch successfully, and the user grants permission when prompted.
+- **GitHub commands prompt for auth**  
+  Run `gh auth login` beforehand and confirm the personal access token has the `repo` scope.
+- **`install-skill.sh` reports “Unknown skill”**  
+  Run the script from the repo root or pass a valid skill name (`chrome-devtools`, `diagram`, `github`, or `review`).
+- **Want to roll back to pre-workshop state**  
+  Restore the backup tarball generated during Quick Start: `tar -xzf ~/.claude-backup.<date>.tgz -C ~`.
 
+## Closing Thoughts
+
+This repository demonstrates a self-contained way to distribute Claude skills, but it still relies on sharing the global `~/.claude` namespace. We would love to see a future `--strict-skills-config` flag (or similar) that lets Claude load skills from an isolated workspace per project or repo. That capability would simplify workshops, eliminate manual permission edits, and make selective installs even safer for attendees.
