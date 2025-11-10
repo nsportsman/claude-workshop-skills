@@ -16,30 +16,70 @@ Curated Claude MCP skills ready for live workshops and self-serve setup. The rep
 ## Architecture Overview
 
 ```mermaid
-flowchart LR
-    Repo[Workshop Repo] --> Scripts[scripts/install-skill.sh]
-    Repo --> Skills
-    Repo --> Hooks
-    Repo --> Settings
-    Repo --> MCP
+flowchart TB
+    Repo[Workshop Repo]
+    Script[scripts/install-skill.sh]
 
-    subgraph Skills[skills/]
-        chrome[chrome-devtools]
-        diagram[diagram]
-        github[github]
-        review[review]
+    Repo --> Script
+    Repo --> Skills
+    Repo --> Support
+
+    subgraph Skills["Skill Definitions"]
+        Chrome[`skills/chrome-devtools`]
+        Diagram[`skills/diagram`]
+        Github[`skills/github`]
+        Review[`skills/review`]
     end
 
-    Scripts --> ClaudeHome[~/.claude]
-    Skills --> ClaudeHome
-    Hooks --> ClaudeHome
-    Settings --> ClaudeHome
-    MCP --> ClaudeHome
+    subgraph Support["Supporting Files"]
+        HookCD[`hooks/hooks.chrome-devtools.ts`]
+        HookGH[`hooks/hooks.github.ts`]
+        SetCD[`settings/settings.chrome-devtools.json`]
+        SetGH[`settings/settings.github.json`]
+        MCPChrome[`mcp/mcp.chrome-devtools.json`]
+    end
 
-    ClaudeHome --> ClaudeAgent[Claude Session]
+    subgraph Claude["~/.claude destinations"]
+        DestSkills[`skills/<name>`]
+        DestHooks[`hooks/`]
+        DestSettings[`settings/`]
+        DestMCP[`mcp/`]
+        SettingsJson[`settings.json allowlist`]
+    end
+
+    Script --> Chrome
+    Script --> Diagram
+    Script --> Github
+    Script --> Review
+
+    Chrome --> HookCD
+    Chrome --> SetCD
+    Chrome --> MCPChrome
+
+    Github --> HookGH
+    Github --> SetGH
+
+    Diagram -. optional -.-> SettingsJson
+    Review --> SettingsJson
+
+    Chrome --> DestSkills
+    Diagram --> DestSkills
+    Github --> DestSkills
+    Review --> DestSkills
+
+    HookCD --> DestHooks
+    HookGH --> DestHooks
+    SetCD --> DestSettings
+    SetGH --> DestSettings
+    MCPChrome --> DestMCP
+
+    Script --> DestSkills
+    Script --> DestHooks
+    Script --> DestSettings
+    Script --> DestMCP
 ```
 
-Each directory mirrors a part of the attendee's `~/.claude` workspace. The helper script orchestrates copying only the selected skill (plus its hooks/settings/MCP support) into place so the Claude session can immediately activate the new capability set.
+Each skill explicitly lists the Hook/Settings/MCP artifacts it depends on. The helper script resolves those dependencies, copying the skill folder plus supporting files into the matching directories under `~/.claude`, and reminds attendees to update the global `settings.json` allowlist when required.
 
 ## Skill Index
 
